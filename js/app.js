@@ -8,28 +8,62 @@ const loadProducts = () =>
 // show all product in UI 
 const showProducts = (products) =>
 {
+  const startTotal = 5;
   const allProducts = products.map((pd) => pd);
   for (const product of allProducts)
   {
+    const className = `id-${ product.id }`;
     // Second Bug //
     const image = product.image;
     const prices = product.price;
     const price = prices.toFixed(2);
     const div = document.createElement("div");
     div.classList.add("product");
-    div.innerHTML = `<div class="single-product">
+    div.innerHTML = `
+    <div class="single-product">
       <div>
-    <img class="product-image" src=${ image }></img>
+        <img class="product-image" src=${ image }></img>
+        <h3 class="title">${ product.title }</h3>
+        <p>Category: ${ product.category }</p>
+        <p>Average Rating: ${ product.rating.rate } ,${ product.rating.count } Ratings </p>
       </div>
-      <h3>${ product.title }</h3>
-      <p>Category: ${ product.category }</p>
-      <h2>Price: $ ${ price }</h2>
-      <button onclick="addToCart(${ product.id },${ product.price })" id="addToCart-btn" class="buy-now btn btn-success">add to cart</button>
-      <button id="details-btn" class="btn btn-danger">Details</button></div>
+      
+      <div class="${ className }">
+        <h2>Price: $ ${ price }</h2>
+        <div class="star-outer">
+          <div class="star-inner">
+          </div>
+        </div>
+        <span>${ product.rating.rate } (${ product.rating.count })</span>
+        <br>
+        <button onclick="addToCart(${ product.id },${ product.price })" id="addToCart-btn" class="buy-now btn btn-success">add to cart</button>
+        <button id="details-btn" class="btn btn-danger">Details</button>
+      </div>
+    </div>
       `;
     document.getElementById("all-products").appendChild(div);
+    const rating = product.rating.rate;
+    getRatings(className, rating, startTotal)
   }
 };
+
+
+
+// Rating Calculate Function
+const getRatings = (className, rating, startTotal) =>
+{
+  // to get percentage of rating
+  const percentage = (rating / startTotal) * 100;
+
+  // rounded to nearest 10
+  const percentageRounded = `${ Math.round(percentage * 10) / 10 }%`;
+
+  // set widht of starts inner to percentage
+  document.querySelector(`.${ className } .star-inner`).style.width = percentageRounded;
+}
+
+
+// Add to Cart Function System
 let count = 0;
 const addToCart = (id, price) =>
 {
@@ -41,6 +75,7 @@ const addToCart = (id, price) =>
   updateTotal(); // Forth bug called the updateTotal Function
 };
 
+// For receive Input Value
 const getInputValue = (id) =>
 {
   const element = document.getElementById(id).innerText;
@@ -63,23 +98,28 @@ const setInnerText = (id, value) =>
   document.getElementById(id).innerText = value.toFixed(2); //After Point added two number
 };
 
+const setInnerTextDelivery = (id, value) =>
+{
+  document.getElementById(id).innerText = value;
+}
+
 // update delivery charge and total Tax
 const updateTaxAndCharge = () =>
 {
   const priceConverted = getInputValue("price");
   if (priceConverted > 200)
   {
-    setInnerText("delivery-charge", 30);
+    setInnerTextDelivery("delivery-charge", 30);
     setInnerText("total-tax", priceConverted * 0.2);
   }
   if (priceConverted > 400)
   {
-    setInnerText("delivery-charge", 50);
+    setInnerTextDelivery("delivery-charge", 50);
     setInnerText("total-tax", priceConverted * 0.3);
   }
   if (priceConverted > 500)
   {
-    setInnerText("delivery-charge", 60);
+    setInnerTextDelivery("delivery-charge", 60);
     setInnerText("total-tax", priceConverted * 0.4);
   }
 };
